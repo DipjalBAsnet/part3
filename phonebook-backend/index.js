@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+
 let persons = [
   {
     id: 1,
@@ -22,9 +23,19 @@ let persons = [
     number: "39-23-6423122",
   },
 ];
+const currentTime = new Date().toString();
+
+const entries = persons.length;
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
+});
+
+app.get("/info", (request, response) => {
+  const responseMessage = `<p>Phonebook has info of ${entries} people</p>
+      <p>${currentTime}</p>`;
+
+  response.send(responseMessage);
 });
 
 const PORT = 3001;
