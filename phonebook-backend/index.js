@@ -39,6 +39,14 @@ app.get("/info", (request, response) => {
   response.send(responseMessage);
 });
 
+app.post("api/persons", (request, response) => {
+  const { name, number } = request.body;
+
+  if (!name || !number) {
+    return response.status(404).json({ error: "name and number are requird" });
+  }
+});
+
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   const person = persons.find((person) => person.id === id);
