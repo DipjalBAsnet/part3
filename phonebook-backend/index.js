@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 let persons = [
   {
@@ -55,6 +56,17 @@ app.delete("/api/persons/:id", (request, response) => {
   console.log("deleted");
 
   response.status(204).end();
+});
+
+app.post("/api/persons", (request, response) => {
+  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
+
+  const person = request.body;
+  person.id = maxId + 1;
+
+  persons = persons.concat(person);
+
+  response.json(person);
 });
 
 const PORT = 3001;
