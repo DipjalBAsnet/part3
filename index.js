@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
-app.use(express.json());
+const path = require("path");
+app.use(express.static(path.join(__dirname, "../part2/phonebook/build")));
 app.use(morgan("tiny"));
 app.use(cors());
 
