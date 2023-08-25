@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
 const path = require("path");
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "../part2/phonebook/build")));
 app.use(morgan("tiny"));
 app.use(cors());
@@ -44,12 +45,26 @@ app.get("/info", (request, response) => {
   response.send(responseMessage);
 });
 
-app.post("api/persons", (request, response) => {
+app.post("/api/persons", (request, response) => {
   const { name, number } = request.body;
 
   if (!name || !number) {
-    return response.status(404).json({ error: "name and number are requird" });
+    return response
+      .status(400)
+      .json({ error: "Name and number are required." });
   }
+
+  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
+
+  const newPerson = {
+    id: maxId + 1,
+    name,
+    number,
+  };
+
+  persons.push(newPerson);
+
+  response.status(201).json(newPerson);
 });
 
 app.get("/api/persons/:id", (request, response) => {
