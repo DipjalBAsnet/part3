@@ -65,18 +65,24 @@ app.post("/api/persons/:id", (request, response) => {
   response.json(person);
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = Number(request.params.id);
   const person = persons.find((person) => person.id === id);
   console.log("seperate id");
   if (person) {
     response.json(person);
   } else {
-    response.status(404).json({ error: "person not found" });
+    response
+      .status(404)
+      .end()
+      .catch(
+        console.log("error catched when getting person from id"),
+        (error) => next(error)
+      );
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then((result) => {
       console.log("successfully deleted");
@@ -84,7 +90,7 @@ app.delete("/api/persons/:id", (request, response) => {
     })
     .catch((error) => {
       console.log(error);
-      response.status(404).end;
+      next(error);
     });
 });
 
