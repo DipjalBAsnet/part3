@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
@@ -14,6 +15,32 @@ const currentTime = new Date().toString();
 
 // const entries = persons.length;
 
+app.post("/api/persons", (request, response) => {
+  console.log("recieved post request to api/persons");
+  const { name, number } = request.body;
+  console.log("request body", request.body);
+
+  if (!name || !number) {
+    return response
+      .status(400)
+      .json({ error: "Name and number are required." });
+  }
+
+  const newPerson = new Person({
+    name: name,
+    number: number,
+  });
+  console.log("creating new person", newPerson);
+
+  // persons.push(newPerson);
+
+  // response.status(201).json(newPerson);
+  newPerson.save().then((result) => {
+    console.log("person saved", result);
+    response.json(result);
+  });
+});
+
 app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => {
     response.json(persons);
@@ -27,26 +54,15 @@ app.get("/info", (request, response) => {
   response.send(responseMessage);
 });
 
-app.post("/api/persons", (request, response) => {
-  const { name, number } = request.body;
-
-  if (!name || !number) {
-    return response
-      .status(400)
-      .json({ error: "Name and number are required." });
-  }
-
+app.post("/api/persons/:id", (request, response) => {
   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
 
-  const newPerson = {
-    id: maxId + 1,
-    name,
-    number,
-  };
+  const person = request.body;
+  person.id = maxId + 1;
 
-  persons.push(newPerson);
+  persons = persons.concat(person);
 
-  response.status(201).json(newPerson);
+  response.json(person);
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -68,17 +84,7 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
-app.post("/api/persons/:id", (request, response) => {
-  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
-
-  const person = request.body;
-  person.id = maxId + 1;
-
-  persons = persons.concat(person);
-
-  response.json(person);
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`);
 });
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT);
-console.log(`server running on port ${PORT}`);
