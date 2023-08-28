@@ -5,6 +5,7 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const Person = require("./models/person");
+const person = require("./models/person");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../part2/phonebook/build")));
@@ -48,10 +49,16 @@ app.get("/api/persons", (request, response) => {
 });
 
 app.get("/info", (request, response) => {
-  const responseMessage = `<p>Phonebook has info of ${entries} people</p>
-      <p>${currentTime}</p>`;
-
-  response.send(responseMessage);
+  Person.countDocuments({})
+    .then((count) => {
+      const responseMessage = `<p>Phonebook has info of ${count} people</p>
+      <p>${new Date().toString()}</p>`;
+      response.send(responseMessage);
+    })
+    .catch((error) => {
+      console.error("Error fetching count:", error);
+      response.status(500).end();
+    });
 });
 
 app.post("/api/persons/:id", (request, response) => {
@@ -66,20 +73,18 @@ app.post("/api/persons/:id", (request, response) => {
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  console.log("seperate id");
-  if (person) {
-    response.json(person);
-  } else {
-    response
-      .status(404)
-      .end()
-      .catch(
-        console.log("error catched when getting person from id"),
-        (error) => next(error)
-      );
-  }
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching person:", error);
+      next(error);
+    });
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
