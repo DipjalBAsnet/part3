@@ -62,13 +62,6 @@ app.get("/info", (request, response) => {
 });
 
 app.post("/api/persons/:id", (request, response) => {
-  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
-
-  const person = request.body;
-  person.id = maxId + 1;
-
-  persons = persons.concat(person);
-
   response.json(person);
 });
 
