@@ -5,16 +5,11 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const Person = require("./models/person");
-const person = require("./models/person");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../part2/phonebook/build")));
 app.use(morgan("tiny"));
 app.use(cors());
-
-const currentTime = new Date().toString();
-
-// const entries = persons.length;
 
 app.post("/api/persons", (request, response) => {
   console.log("recieved post request to api/persons");
@@ -33,9 +28,6 @@ app.post("/api/persons", (request, response) => {
   });
   console.log("creating new person", newPerson);
 
-  // persons.push(newPerson);
-
-  // response.status(201).json(newPerson);
   newPerson.save().then((result) => {
     console.log("person saved", result);
     response.json(result);
