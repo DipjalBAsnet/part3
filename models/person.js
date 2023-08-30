@@ -1,20 +1,13 @@
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
-if (process.argv.length < 3) {
-  console.log("provide password as arguement");
-  process.exit(1);
-}
-
-const password = process.argv[2];
-
-const url = `mongodb+srv://dipjal5678:${password}@cluster0.cgpzzih.mongodb.net/phonebook-database?retryWrites=true&w=majority`;
+const url = process.env.MONGODB_URI;
 
 console.log("connecting to", url);
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log("connected to mongodb");
   })
   .catch((error) => {
